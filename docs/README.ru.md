@@ -2,7 +2,7 @@
 <h1 align="center">NativePluginConverter</h1>
 <p align="center"><strong>Больше свободы для ваших плагинов.</strong></p>
 <p align="center">Десктопное приложение для переноса нативных аудиоплагинов в другую DAW через мост.</p>
-<p align="center"><a href="../README.md">English</a> · <a href="BUILD.md">Сборка</a> · <a href="COMPATIBILITY.md">Совместимость</a> · <a href="../LICENSE">MIT</a></p>
+<p align="center"><a href="https://github.com/h4s10/NativePluginConverter/releases">Скачать</a> · <a href="../README.md">English</a> · <a href="BUILD.md">Сборка</a> · <a href="COMPATIBILITY.md">Совместимость</a> · <a href="../LICENSE">MIT</a></p>
 
 ![Библиотека инструментов и эффектов с выбором трёх плагинов для экспорта](images/library.png)
 
@@ -34,6 +34,19 @@ DLL, пресеты, шрифты и сэмплы читаются из ваше
 
 **Конвертер кроссплатформенный, но готовые мосты пока работают только в Windows x64.**
 Сборка архива на Mac или Linux не создаёт плагин для этих систем.
+
+## Скачать приложение
+
+Готовые сборки доступны на [странице релизов GitHub](https://github.com/h4s10/NativePluginConverter/releases).
+Выберите архив для своей системы: **Windows x64**, **macOS Apple Silicon**,
+**macOS Intel** или **Linux x64**. Скачайте ZIP приложения из вложений релиза
+и распакуйте папку целиком. Автоматические архивы `Source code` содержат исходники,
+а не готовое приложение.
+
+В Windows запустите `NativePluginConverter.exe`, на macOS — `NativePluginConverter.app`,
+на Linux — `NativePluginConverter`. Windows-сборки не имеют цифровой подписи;
+macOS-сборки подписаны ad-hoc и не нотарифицированы Apple.
+Готовые мосты плагинов по-прежнему предназначены только для Windows x64.
 
 ## Запуск из исходников
 

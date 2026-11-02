@@ -7,6 +7,7 @@
   A desktop app for bringing native audio plugins into another DAW through a bridge.
 </p>
 <p align="center">
+  <a href="https://github.com/h4s10/NativePluginConverter/releases">Download</a> ·
   <a href="LICENSE">MIT license</a> ·
   <a href="#get-started">Get started</a> ·
   <a href="docs/README.ru.md">Русский</a> ·
@@ -44,7 +45,20 @@ and license notices. Original plugin files stay in your own FL Studio installati
 **The app is cross-platform; the exported bridge currently runs only on Windows x64.**
 Creating an archive on macOS or Linux does not create a macOS or Linux plugin.
 
+## Download
+
+Download the desktop app from [GitHub Releases](https://github.com/h4s10/NativePluginConverter/releases).
+Choose **Windows x64**, **macOS Apple Silicon**, **macOS Intel**, or **Linux x64**
+and extract the complete ZIP. Use the application archive attached to the release,
+rather than GitHub's automatically generated source-code archive.
+
+Run `NativePluginConverter.exe` on Windows, `NativePluginConverter.app` on macOS,
+or `NativePluginConverter` on Linux. Windows builds are unsigned; macOS builds
+are ad-hoc signed and not notarized. Exported plugins still target Windows x64.
+
 ## Get started
+
+### Run from source
 
 Build from source with **Node.js 24** and **Zig 0.14.1**:
 
