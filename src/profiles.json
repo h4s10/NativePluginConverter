@@ -1,0 +1,276 @@
+{
+  "SYSTEM": [
+    "advapi32",
+    "avicap32",
+    "avifil32",
+    "avrt",
+    "bcrypt",
+    "bcryptprimitives",
+    "cabinet",
+    "cfgmgr32",
+    "clbcatq",
+    "combase",
+    "comctl32",
+    "comdlg32",
+    "crypt32",
+    "cryptbase",
+    "cryptnet",
+    "cryptsp",
+    "d2d1",
+    "d3d10",
+    "d3d10_1",
+    "d3d11",
+    "d3d12",
+    "d3d9",
+    "dbgcore",
+    "dbghelp",
+    "dcomp",
+    "ddraw",
+    "dhcpcsvc",
+    "dinput",
+    "dinput8",
+    "dnsapi",
+    "dsound",
+    "dwmapi",
+    "dwrite",
+    "dxcore",
+    "dxgi",
+    "dxva2",
+    "fwpuclnt",
+    "gdi32",
+    "gdiplus",
+    "glu32",
+    "hid",
+    "imagehlp",
+    "imm32",
+    "iphlpapi",
+    "kernel32",
+    "kernelbase",
+    "ksuser",
+    "mf",
+    "mfcore",
+    "mfplat",
+    "mfreadwrite",
+    "mfuuid",
+    "mlang",
+    "mmdevapi",
+    "mpr",
+    "msacm32",
+    "msasn1",
+    "mscms",
+    "mscoree",
+    "msctf",
+    "msdmo",
+    "msimg32",
+    "msvcp_win",
+    "msvcrt",
+    "msvfw32",
+    "mswsock",
+    "msxml3",
+    "msxml6",
+    "ncrypt",
+    "netapi32",
+    "nlansp_c",
+    "normaliz",
+    "nsi",
+    "ntdll",
+    "ole32",
+    "oleacc",
+    "oleaut32",
+    "oledlg",
+    "opengl32",
+    "pdh",
+    "pnrpnspr",
+    "powrprof",
+    "profapi",
+    "propsys",
+    "psapi",
+    "rasapi32",
+    "rasman",
+    "resampledmo",
+    "riched20",
+    "riched32",
+    "rpcrt4",
+    "rsaenh",
+    "sechost",
+    "secur32",
+    "sensapi",
+    "setupapi",
+    "shcore",
+    "shell32",
+    "shfolder",
+    "shlwapi",
+    "sspicli",
+    "tapi32",
+    "ucrtbase",
+    "urlmon",
+    "user32",
+    "userenv",
+    "usp10",
+    "uxtheme",
+    "version",
+    "wer",
+    "wevtapi",
+    "win32u",
+    "windowscodecs",
+    "winhttp",
+    "wininet",
+    "winmm",
+    "winmmbase",
+    "winnsi",
+    "winrnr",
+    "winscard",
+    "winspool",
+    "winspool.drv",
+    "wintrust",
+    "wlanapi",
+    "wldap32",
+    "ws2_32",
+    "wshbth",
+    "wsock32",
+    "wtsapi32",
+    "xinput1_4",
+    "xinput9_1_0"
+  ],
+  "HOST_ONLY": [
+    "flengine.dll",
+    "flengine_x64.dll",
+    "fruityplug.dll",
+    "fruityplug_x64.dll"
+  ],
+  "RUNTIME": [
+    "blend2d.dll",
+    "dsp_ippv2.dll",
+    "dsp_ippv2_x64.dll",
+    "freetype.dll",
+    "freetype_x64.dll",
+    "quickfontcache.dll",
+    "quickfontcache_x64.dll"
+  ],
+  "DSP": [
+    "directwavectengine_x64.dll",
+    "elastique.dll",
+    "elastique_x64.dll",
+    "ildsp_x64.dll",
+    "ilsvg_x64.dll",
+    "reverb_x64.dll",
+    "sg_x64.dll"
+  ],
+  "ILDSP_SYMBOLS": [
+    "GeneralPitchShifter_CreateInstance",
+    "LimiterLite_CreateInstance",
+    "Limiter_CreateInstance",
+    "LowFreqEnhancer_CreateInstance",
+    "PSOLA_CreateInstance",
+    "Shimmer_CreateInstance",
+    "StereoEnhancer_CreateInstance",
+    "TransientLooper_CreateInstance",
+    "WaveformColouring_CreateInstance"
+  ],
+  "ELASTIQUE_SYMBOLS": [
+    "Auftakt_CreateInstance",
+    "Auftakt_CreateInstance2",
+    "Declicker_CreateInstance",
+    "Denoiser_CreateInstance",
+    "ElProDirect_CreateInstance",
+    "ElProV3Direct_CreateInstance",
+    "ElProV3_CreateInstance",
+    "ElPro_CreateInstance",
+    "ElResampleSource_CreateInstance",
+    "Metering_CreateInstance",
+    "SolPitchAn_CreateInstance",
+    "SolPitchAn_CreatePitchMarks"
+  ],
+  "ELASTIQUE_REQUIRED_PLUGINS": [],
+  "RUNTIME_REQUIRED_REFERENCES": {
+    "autogun": {
+      "sg.dll": "Observed Autogun startup: required SG synthesis library",
+      "sg_x64.dll": "Observed Autogun startup: required SG synthesis library"
+    },
+    "vocodex": {
+      "sg.dll": "Observed Vocodex startup: required SG synthesis library",
+      "sg_x64.dll": "Observed Vocodex startup: required SG synthesis library"
+    },
+    "fruity video player": {
+      "ilvideo_x64.dll": "Observed Video Player startup: required ILVideo decoder library"
+    },
+    "distructor": {
+      "wavpackdll_x64.dll": "Observed Distructor cabinet.wv load: required WavPack decoder"
+    },
+    "flex": {
+      "oggio.dll": "Observed FLEX startup: required oggio decoder",
+      "oggio_x64.dll": "Observed FLEX startup: required oggio decoder"
+    }
+  },
+  "EMBEDDED_PLUGIN_PROFILES": {
+    "flex": [
+      "Plugins/Fruity/Effects/Maximus/Maximus_x64.dll"
+    ],
+    "zgameeditor visualizer": [
+      "Plugins/Fruity/Effects/Control Surface/Control Surface_x64.dll"
+    ]
+  },
+  "REQUIRED_MODULE_PROFILES": {
+    "fruity scratcher": [
+      [
+        "Shared/ILSvg_x64.dll",
+        "Observed Scratcher svgCreate startup call"
+      ]
+    ],
+    "newtime": [
+      [
+        "Plugins/Fruity/Effects/Newtone/Newtone_Engine_x64.dll",
+        "Observed Newtime sibling engine load"
+      ]
+    ],
+    "distructor": [
+      [
+        "Plugins/Fruity/Effects/Fruity Delay 3/engine_x64.dll",
+        "Observed Distructor embedded Delay 3 engine load"
+      ],
+      [
+        "Shared/wavpackdll_x64.dll",
+        "Observed Distructor stock cabinet.wv decoder"
+      ]
+    ],
+    "harmor": [
+      [
+        "Shared/SG_x64.dll",
+        "Harmor resynthesis helper: factory sample preset restoration (observed Chorus ensemble and Moving choir)"
+      ]
+    ]
+  },
+  "CHILD_PROCESS_PROFILES": {
+    "fl slayer": [
+      "System/Tools/Bridge/32bit/ilbridge.exe",
+      "Shared/QuickFontCache.dll",
+      "Shared/freetype.dll",
+      "Shared/dsp_ippv2.dll",
+      "Plugins/Fruity/Generators/FL Slayer/Slayer_Engine.dll"
+    ],
+    "edison": [
+      "System/Tools/Bridge/32bit/ilbridge.exe",
+      "Shared/QuickFontCache.dll",
+      "Shared/freetype.dll",
+      "Shared/dsp_ippv2.dll",
+      "AudioRestore.dll",
+      "iZAudioRestore.dll"
+    ]
+  },
+  "UNSUPPORTED_NAMES": {
+    "fruity wrapper": "Хост сторонних плагинов требует сервисов FL Studio.",
+    "patcher": "Маршрутизация и вложенные плагины требуют сервисов FL Studio.",
+    "midi out": "В текущем мосте нет внешнего MIDI-выхода.",
+    "rewired": "ReWire требует отдельного хоста и маршрутизации.",
+    "fruity send": "Отправка в микшер FL Studio недоступна в отдельном VST3.",
+    "fruity keyboard controller": "Выход управления FL Studio не представлен VST3-мостом.",
+    "fruity envelope controller": "Выход управления FL Studio не представлен VST3-мостом.",
+    "fruity formula controller": "Выход управления FL Studio не представлен VST3-мостом.",
+    "fruity peak controller": "Выход управления FL Studio не представлен VST3-мостом.",
+    "fruity voltage controller": "Аппаратный выход управления не реализован мостом.",
+    "control surface": "Связи контроллеров FL Studio недоступны в отдельном VST3.",
+    "dashboard": "Связи контроллеров FL Studio недоступны в отдельном VST3.",
+    "fruity x-y controller": "Выход управления FL Studio не представлен VST3-мостом.",
+    "fruity x-y-z controller": "Выход управления FL Studio не представлен VST3-мостом."
+  }
+}

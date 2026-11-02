@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: MIT
+'use strict';
+const test = require('node:test'), assert = require('node:assert/strict'), path = require('node:path');
+const { Controller } = require('../src/controller'), { fixture } = require('./fixtures');
+function controller(t) { const f = fixture(t), app = new Controller({ resources: f.base, output: path.join(f.base, 'out') }); return { f, app }; }
+test('scan commits inventory only after successful discovery and rejects unknown IDs', async t => { const { f, app } = controller(t); app.request('scan', { root: f.root }); await app.pending; assert.equal(app.state.job.status, 'complete'); assert.equal(app.state.entries.length, 1); assert.throws(() => app.request('plan', { ids: ['unknown'] })); app.request('scan', { root: f.base }); await app.pending; assert.equal(app.state.job.status, 'failed'); assert.equal(app.state.entries.length, 1); });
+test('overlapping work is rejected, cancellation leaves UI usable', async t => { const { f, app } = controller(t); app.request('scan', { root: f.root }); assert.throws(() => app.request('scan', { root: f.root })); app.cancel(); await app.pending; assert.equal(app.state.job.status, 'cancelled'); app.request('scan', { root: f.root }); await app.pending; assert.equal(app.state.job.status, 'complete'); });
+test('non-Windows hosts allow planning but reject native DLL execution', async t => { const { f, app } = controller(t); app.request('scan', { root: f.root }); await app.pending; const ids = app.state.entries.map(e => e.id); app.request('plan', { ids }); await app.pending; assert.equal(Object.keys(app.state.plans).length, 1); if (process.platform !== 'win32') assert.throws(() => app.request('validate', { ids }), /Windows x64/); });

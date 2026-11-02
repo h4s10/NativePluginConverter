@@ -1,0 +1,39 @@
+{
+  "name": "native-plugin-converter",
+  "version": "0.8.0",
+  "description": "Desktop converter for native audio plugins",
+  "private": true,
+  "main": "src/main.js",
+  "author": "NativePluginConverter contributors",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.js",
+    "build:win": "node scripts/build.js win32 x64",
+    "build:mac": "node scripts/build.js darwin arm64",
+    "build:linux": "node scripts/build.js linux x64",
+    "build:native": "node scripts/build-native.js",
+    "test:native": "node scripts/build-native.js --tests",
+    "check:repo": "node scripts/check-repo.js"
+  },
+  "dependencies": {
+    "yazl": "3.3.1"
+  },
+  "devDependencies": {
+    "electron": "45.0.0",
+    "@electron/packager": "20.3.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "productName": "NativePluginConverter",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h4s10/NativePluginConverter.git"
+  },
+  "homepage": "https://github.com/h4s10/NativePluginConverter#readme",
+  "bugs": {
+    "url": "https://github.com/h4s10/NativePluginConverter/issues"
+  }
+}
