@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="NativePluginConverter">
+  <defs><linearGradient id="brand" x2="1" y2="1"><stop stop-color="#e6aaa9"/><stop offset="1" stop-color="#7962ad"/></linearGradient></defs>
+  <rect x="4" y="4" width="80" height="80" rx="24" fill="url(#brand)"/>
+  <g fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 24v12m0 8v20M44 24v28m0 8v4M60 24v4m0 8v28M22 36h12m4 16h12m4-24h12"/>
+  </g>
+</svg>

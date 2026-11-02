@@ -1,41 +1,52 @@
-# NativePluginConverter
+<p align="center">
+  <img src="docs/images/mark.svg" width="80" height="80" alt="NativePluginConverter icon">
+</p>
+<h1 align="center">NativePluginConverter</h1>
+<p align="center"><strong>Your plugins. More places to create.</strong></p>
+<p align="center">
+  A desktop app for bringing native audio plugins into another DAW through a bridge.
+</p>
+<p align="center">
+  <a href="LICENSE">MIT license</a> ·
+  <a href="#get-started">Get started</a> ·
+  <a href="docs/README.ru.md">Русский</a> ·
+  <a href="docs/COMPATIBILITY.md">Compatibility</a> ·
+  <a href="docs/BUILD.md">Build guide</a>
+</p>
 
-A desktop application for packaging native audio plugins for use in another DAW.
-Choose plugins from a local library and export one ZIP per plugin, with its bridge,
-configuration and license notices. Original DLLs, presets, fonts and samples
-are read from the user’s installed FL Studio, never copied into exported ZIPs.
+![NativePluginConverter library with instruments, effects and a three-plugin export selection](docs/images/library.png)
 
-**Current implementation:** FL Studio native Windows x64 plugins → Windows x64
-VST3. The converter runs on Windows, macOS and Linux; exported plugins currently
-run **only on Windows x64**. Other DAWs' native plugin formats and other output
-systems are future work, not supported conversion targets today.
+<p align="center"><sub>Real application capture on macOS. The current interface is in Russian. The library shown is an example, not a list of verified compatible plugins.</sub></p>
 
-[Русская документация](docs/README.ru.md) · [Build instructions](docs/BUILD.md) ·
-[Compatibility](docs/COMPATIBILITY.md) · [Third-party notices](THIRD_PARTY_NOTICES.md)
+## Browse. Select. Export.
 
-## Features
+Choose instruments and effects from your local library and create a separate ZIP
+for each plugin. Each archive contains the VST3 bridge, configuration, metadata
+and license notices. Original plugin files stay in your own FL Studio installation.
 
-- Searchable library with instrument/effect categories and batch export.
-- Dependency checks against the selected installation; factory presets are read in place.
-- Original native plugin sound and interface hosted by a VST3 bridge.
-- Preset browser, sample drag-and-drop where supported, and instrument Channel controls.
-- Local processing, background operations and cancellation.
-- Optional isolated launch checks on Windows x64.
+- **One library:** search plugins and switch between instruments and effects.
+- **Batch export:** select several plugins and build their archives together.
+- **Native sound and interface:** the bridge hosts the original plugin where supported.
+- **Creative controls:** factory preset browsing, sample drag-and-drop and instrument Channel settings, depending on the plugin.
+- **Local workflow:** scanning and packaging run on your computer, with background progress and cancellation.
+- **Optional launch checks:** Windows x64 can test basic loading, audio, state and editor lifecycle.
 
-This repository contains the converter and bridge source, plus MIT-licensed VST3
-interface headers. It contains **no Image-Line plugin DLLs, presets, fonts, samples,
-FL Studio installation, compiled bridge binaries or converted-plugin archives**.
-Use your own installed Windows edition of FL Studio as the input library.
+## What works today
 
-Bridge 0.6.1 refuses reported demo/trial instances and unsupported product-check
-requests, and honors native requests to disable parameter automation. This may
-also reject purchased plugins that depend on FL Studio's product-check service.
-See [runtime restrictions and limits](docs/INSTALLED_FL.md#runtime-restrictions-bridge-061).
+| Component | Current support |
+| --- | --- |
+| Desktop converter | Windows x64, macOS Apple Silicon / Intel, Linux x64 |
+| Source library | Native plugins from FL Studio for Windows x64 |
+| Export format | VST3 for Windows x64 |
+| Target computer | Windows x64 with its own compatible FL Studio and plugin installation |
+| Other source DAWs, formats and output systems | Future work; not implemented yet |
 
-## Development quick start
+**The app is cross-platform; the exported bridge currently runs only on Windows x64.**
+Creating an archive on macOS or Linux does not create a macOS or Linux plugin.
 
-Requirements: Node.js 24 and [Zig 0.14.1](https://ziglang.org/download/0.14.1/).
-The native bridge can be cross-compiled from macOS/Linux; it still targets Windows.
+## Get started
+
+Build from source with **Node.js 24** and **Zig 0.14.1**:
 
 ```sh
 npm ci
@@ -44,57 +55,77 @@ npm run build:native
 npm start
 ```
 
-Zig must be on `PATH`, or `ZIG` must point to its executable. The UI can start
-without the native build, but exporting requires the generated bridge. See
-[BUILD.md](docs/BUILD.md) for desktop packages and native tests.
+Put Zig on `PATH`, or set `ZIG` to its executable. The Windows bridge can be
+cross-compiled from macOS and Linux; FL Studio DLLs are not needed for compilation.
+The interface can start without a native build, but exporting requires it.
+See the [build guide](docs/BUILD.md) for desktop packages and native tests.
 
-## Using the converter
+### Create your first bridge
 
-1. Open Settings and select a Windows FL Studio installation folder containing `Plugins/Fruity`.
-2. Scan the library and select plugins.
-3. Choose an output directory and create the archives.
-4. On Windows, close your DAW and copy each complete `.vst3` directory from the ZIP
-   into `C:\Program Files\Common Files\VST3`. Rescan plugins in the DAW.
+1. Open **Settings** and select a Windows FL Studio folder containing `Plugins/Fruity`.
+2. Scan the library, then choose your instruments and effects.
+3. Pick an output folder and select **Create archive**.
+4. On the target Windows computer, close your DAW and copy the complete `.vst3`
+   folder from the ZIP into `C:\Program Files\Common Files\VST3`.
+5. Rescan VST3 plugins in your DAW.
 
-The target computer must have FL Studio installed, including the original plugin.
-Do not copy its DLLs into the bridge bundle. Existing ZIPs are not overwritten.
+![Completed Distructor bridge export with archive location and installation instructions](docs/images/export.png)
 
-On Windows, scanning a library saves its path locally for all bridges. Standard
-installations under `Program Files/Image-Line` can also be detected automatically.
-For custom locations, multiple installations, or ZIPs built on macOS/Linux, see
-[Installation discovery](docs/INSTALLED_FL.md).
-Only explicitly unavailable components are marked in the library; detailed
-resource analysis and launch results are under **Composition and checks**
-(`Зависимости и проверка` in the current Russian interface).
+*One archive per plugin, with installation instructions. Creating an archive does
+not verify every feature or establish that the original plugin is licensed.*
 
-## Project layout
+The target computer needs its own FL Studio installation and the original plugin.
+**Do not copy FL Studio DLLs into the bridge folder.** Existing ZIPs are not overwritten.
+On Windows, scanning a library saves the selected installation path locally;
+standard installations can also be detected automatically.
+
+For custom paths, multiple installations or archives created on another computer,
+see [installation discovery](docs/INSTALLED_FL.md). Detailed dependency information
+and launch results are available under **Зависимости и проверка** in the app.
+
+## Compatibility and limits
+
+Support varies by plugin and host DAW. Discovery in the library or a successful
+launch check is not a guarantee of full compatibility. Components that require
+unimplemented FL Studio host services may be unavailable. Preset, drag-and-drop,
+routing and MIDI limitations are documented in the [compatibility guide](docs/COMPATIBILITY.md).
+
+Bridge **0.6.1** rejects reported demo/trial instances and unsupported product-check
+requests, and honors native requests to disable parameter automation. This can
+also reject purchased plugins that depend on FL Studio's product-check service.
+These safeguards are not a complete license validator; see
+[runtime restrictions](docs/INSTALLED_FL.md#runtime-restrictions-bridge-061).
+
+## Inside the project
 
 | Directory | Purpose |
 | --- | --- |
 | `ui/` | Electron interface |
-| `src/` | Desktop process, worker, inventory, dependency resolver and ZIP packaging |
-| `native/bridge/` | Windows x64 native ABI / VST3 bridge |
-| `native/third_party/pluginterfaces/` | Vendored VST3 interface headers and license |
-| `tests/`, `native/tests/` | Synthetic unit tests and native/integration probes |
-| `resources/` | Generated bridge/probe and initial empty compatibility cache |
-| `scripts/` | Build, smoke-test and source-publication checks |
+| `src/` | Desktop process, inventory, dependency resolver and ZIP packaging |
+| `native/bridge/` | Windows x64 native ABI and VST3 bridge |
+| `native/third_party/pluginterfaces/` | VST3 interface headers and license |
+| `tests/`, `native/tests/` | Unit tests and native/integration probes |
+| `resources/` | Locally generated bridge/probe and empty compatibility cache |
+| `scripts/` | Build, smoke-test and publication checks |
 
-The present backend is specific to FL Studio. Additional backends, formats and
-platforms will need their own implementation and testing; renaming the product
-does not make the existing native bridge portable.
+Additional backends, formats and platforms need their own implementation and testing.
+For a bug report, include your OS, DAW, plugin version and reproduction steps.
+Do not attach vendor DLLs, license keys or private files.
 
-## License and third-party material
+## License
 
-Project-owned code is licensed under **MIT**; see [LICENSE](LICENSE).
-The VST3 headers and toolchain components retain their own licenses and notices.
-Retain the MIT copyright/license notice and the applicable third-party notices
-when distributing copies or binaries.
+Project-owned code is available under the [MIT license](LICENSE).
+VST3 headers and toolchain components retain their own
+[third-party licenses and notices](THIRD_PARTY_NOTICES.md). Keep the applicable
+copyright and license notices when distributing source or binaries.
 
-FL Studio plugins and their assets remain third-party proprietary material. The
-project's license does not grant rights to redistribute them. New converted ZIPs
-contain only bridge code/configuration/notices. Do not add vendor files to these
-archives, source commits, issues or releases. Changing the project license and
-loading installed files does not by itself resolve questions under the vendor's
-EULA or the law governing reverse engineering.
-NativePluginConverter is independent and is not affiliated with Image-Line or
-Steinberg. Product names are used to identify compatibility.
+This repository contains **no Image-Line plugin DLLs, presets, fonts, samples or
+FL Studio installation**. Generated binaries and plugin archives are not committed.
+Exported ZIPs contain the bridge and supporting configuration/notices, not vendor assets.
+
+MIT does not grant rights to redistribute FL Studio files or override Image-Line's
+EULA. Loading installed files and adding trial safeguards do not by themselves
+resolve legal questions about interoperability or reverse engineering.
+
+NativePluginConverter is an independent project, not affiliated with Image-Line
+or Steinberg. Product names identify compatibility.
