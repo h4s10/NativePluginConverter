@@ -20,6 +20,7 @@
 #include <vector>
 #include "engine.h"
 #include "config.h"
+#include "startup_diagnostics.h"
 #include "file_drop.h"
 #include "editor_host_guard.h"
 #include "editor_shortcuts.h"
@@ -193,10 +194,11 @@ public:
         if (initialized) return kResultFalse;
         try {
             const auto& config = configuration();
-            if (!config.valid || !engine.openConfigured(config.iniPath.c_str())) return kResultFalse;
-            if (engine.isInstrument() != config.instrument) { engine.close(); return kResultFalse; }
+            if (!config.valid) { StartupDiagnostics::record(config,config.error); return kResultFalse; }
+            if (!engine.openConfigured(config.iniPath.c_str())) { StartupDiagnostics::record(config,engine.error()); return kResultFalse; }
+            if (engine.isInstrument() != config.instrument) { StartupDiagnostics::record(config,"Native plugin kind does not match bridge configuration"); engine.close(); return kResultFalse; }
             count = engine.parameterCount();
-            if (count < 0 || count > 65536) { engine.close(); return kResultFalse; }
+            if (count < 0 || count > 65536) { StartupDiagnostics::record(config,"Native plugin returned an unsupported parameter count"); engine.close(); return kResultFalse; }
             values = std::make_unique<std::atomic<double>[]>(count);
             editValues = std::make_unique<std::atomic<double>[]>(count);
             pendingEdits = std::make_unique<std::atomic<bool>[]>(count);
@@ -211,7 +213,7 @@ public:
                 pendingEdits[i].store(false);
             }
             engine.configure(sampleRate, maxBlock);
-            if (!engine.ready()) { engine.close(); count = 0; return kResultFalse; }
+            if (!engine.ready()) { StartupDiagnostics::record(config,engine.error()); engine.close(); count = 0; return kResultFalse; }
             scratchLeft.resize(maxBlock);
             scratchRight.resize(maxBlock);
             inputLeft.resize(maxBlock); inputRight.resize(maxBlock);
@@ -852,7 +854,7 @@ public:
         *info = {}; std::memcpy(info->cid, componentId(), 16); info->cardinality = PClassInfo::kManyInstances;
         ascii(info->category, kVstAudioEffectClass); ascii(info->name, pluginName());
         ascii(info->subCategories, instrument() ? "Instrument|Synth" : "Fx"); ascii(info->vendor, vendorName);
-        ascii(info->version, "0.6.1"); ascii(info->sdkVersion, kVstVersionString);
+        ascii(info->version, "0.6.3"); ascii(info->sdkVersion, kVstVersionString);
         info->classFlags = kSimpleModeSupported; return kResultOk;
     }
     tresult PLUGIN_API getClassInfoUnicode(int32 index, PClassInfoW* info) override {
@@ -860,7 +862,7 @@ public:
         *info = {}; std::memcpy(info->cid, componentId(), 16); info->cardinality = PClassInfo::kManyInstances;
         ascii(info->category, kVstAudioEffectClass); utf16(info->name, PClassInfo::kNameSize, pluginName());
         ascii(info->subCategories, instrument() ? "Instrument|Synth" : "Fx"); utf16(info->vendor, PClassInfo2::kVendorSize, vendorName);
-        utf16(info->version, PClassInfo2::kVersionSize, "0.6.1"); utf16(info->sdkVersion, PClassInfo2::kVersionSize, kVstVersionString);
+        utf16(info->version, PClassInfo2::kVersionSize, "0.6.3"); utf16(info->sdkVersion, PClassInfo2::kVersionSize, kVstVersionString);
         info->classFlags = kSimpleModeSupported; return kResultOk;
     }
     tresult PLUGIN_API setHostContext(FUnknown*) override { return kResultOk; }

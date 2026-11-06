@@ -5,6 +5,7 @@ x64 → VST3 Windows x64. The Electron app is cross-platform; the bridge is not.
 DLLs, presets or samples. The target computer must have its own compatible
 FL Studio installation; moving the ZIP alone does not move the original plugin.
 
+- Bridge 0.6.3 removes the bridge-owned demo/product-check startup rejection affecting Edison in 0.6.1–0.6.2. The original plugin keeps its own mode; this does not establish activation or complete project restoration. See [runtime behavior](INSTALLED_FL.md#runtime-behavior-bridge-063).
 - Plugin support varies. Inventory discovery is not proof of working audio/UI.
 - Wrapper, Patcher, VFX and FL-host routing/controller services are unavailable
   where they require the original host. Unsupported components stay visible.

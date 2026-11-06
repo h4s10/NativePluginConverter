@@ -8,6 +8,7 @@
 #include "engine.h"
 #include "config.h"
 #include "shared_loader.h"
+#include "installed_fonts.h"
 #include "preset.h"
 #include "preset_paths.h"
 #include "harmor_preset_paths.h"
@@ -101,18 +102,13 @@ struct Engine::Impl {
  std::vector<HMODULE> dependencies; HMODULE module=nullptr;void* plug=nullptr;PlugInfo* info=nullptr;
  std::wstring lastAcceptedDrop; WIN32_FILE_ATTRIBUTE_DATA lastAcceptedDropInfo{};
  std::string failure,basePath,rootPath,sharedPath,exportPath;std::wstring dialogOwnerKey; HMODULE toolsModule=nullptr; void* realPathManager=nullptr;
- // Restrictive signals are sticky until an explicit new instance is opened.
- // No activation status is inferred from the absence of these signals.
- static constexpr int DemoVersion = 1 << 15;
- bool licenseBlocked=false, closing=false;
+ // Let the original plugin enforce its own mode. The bridge does not modify
+ // native flags or infer activation from successful creation or state calls.
+ bool closing=false;
  std::bitset<65536> automationDisabled;
- void blockLicense(const char* message){if(!licenseBlocked){licenseBlocked=true;failure=message;}}
- bool usable(){
-  if(info&&(info->flags&DemoVersion))blockLicense("Demo/trial plugin instances are not supported by this bridge. Open the plugin in FL Studio to check its license.");
-  return plug&&info&&!licenseBlocked;
- }
+ bool usable(){return plug&&info;}
  bool canAutomate(int index){return usable()&&index>=0&&index<65536&&index<info->params&&!automationDisabled.test(size_t(index));}
- SharedLoader sharedLoader; BridgeConfig config; int latency=0; bool midiInput=false;
+ SharedLoader sharedLoader; InstalledFonts fonts; BridgeConfig config; int latency=0; bool midiInput=false;
  std::array<void*,128> hostVt{};std::array<void*,32> pathVt{};void** pathPtr=nullptr;
  std::array<std::array<float,16384>,10> waves{};
  std::vector<float> scratch,input,temps,voiceScratch;
@@ -226,10 +222,10 @@ struct Engine::Impl {
  case 8:{std::lock_guard<std::recursive_mutex> guard(s.mutex);
   if(index>=0&&value>=index){for(Word i=index;i<=std::min<Word>(value,65535);++i)s.automationDisabled.set(size_t(i));}
   return 0;}
- // FHD_CheckProdCode is reserved in the published interface. Its return value
- // is NOT interpreted as a license result. Stop this instance instead of
- // guessing activation data or continuing with a default-zero response.
- case 26:{std::lock_guard<std::recursive_mutex> guard(s.mutex);s.blockLicense("This plugin requires an unsupported FL Studio product-check service. The bridge has stopped this instance; use it in FL Studio.");return 0;}
+ // FHD_CheckProdCode has no supported implementation here. Keep the historical
+ // unhandled-service response, without dereferencing Value or changing native
+ // flags. Zero is not an activation result; the plugin keeps its own mode.
+ case 26:return 0;
  // Native editor keyboards call these host services, rather than TriggerVoice.
 // Sawer runtime: mouse-down => FHD_NoteOn20, key57, velocity99;
 // mouse-up => FHD_NoteOff21, key57, value-1 (off ignores Value).
@@ -266,7 +262,7 @@ case 20:case 21:case 56:{
 Engine::Engine():p(new Impl){p->facade=this;}
 Engine::~Engine(){close();delete p;}
 bool Engine::openConfigured(const wchar_t* ini){auto cfg=BridgeConfig::load(ini);if(!cfg.valid||!cfg.resolveInstallation()){p->failure=cfg.error;return false;}p->config=cfg;return open(cfg.dllPath.c_str());}
-bool Engine::open(const wchar_t* dll){std::lock_guard<std::recursive_mutex>g(p->mutex);close();p->licenseBlocked=false;p->automationDisabled.reset();p->failure.clear();p->dialogOwnerKey=dll;p->host.app=acquireDialogOwner(p->dialogOwnerKey);p->basePath=utf8(dll);auto i=p->basePath.find_last_of("/\\");p->basePath=p->basePath.substr(0,i+1);p->rootPath=p->config.valid?utf8(p->config.rootPath.c_str()):p->basePath;if(!p->rootPath.empty()&&p->rootPath.back()!='\\')p->rootPath+='\\';p->sharedPath=p->rootPath+"Shared\\";
+bool Engine::open(const wchar_t* dll){std::lock_guard<std::recursive_mutex>g(p->mutex);close();p->automationDisabled.reset();p->failure.clear();p->dialogOwnerKey=dll;p->host.app=acquireDialogOwner(p->dialogOwnerKey);p->basePath=utf8(dll);auto i=p->basePath.find_last_of("/\\");p->basePath=p->basePath.substr(0,i+1);p->rootPath=p->config.valid?utf8(p->config.rootPath.c_str()):p->basePath;if(!p->rootPath.empty()&&p->rootPath.back()!='\\')p->rootPath+='\\';p->sharedPath=p->rootPath+"Shared\\";
  // Exported files remain available after closing the plugin: DAWs may reference
  // them from a saved project. Each instance gets a unique writable directory.
  if(p->exportPath.empty()){wchar_t user[MAX_PATH]{};GUID id{};wchar_t guid[40]{};
@@ -278,7 +274,10 @@ bool Engine::open(const wchar_t* dll){std::lock_guard<std::recursive_mutex>g(p->
  if(!checkX64Dll(dll,p->failure))return false;
  for(const auto&path:p->config.dependencyPaths)if(!checkX64Dll(path,p->failure))return false;
  // Scoped per-module search: never change the DAW's process working directory.
- for(const auto&path:p->config.dependencyPaths){auto m=LoadLibraryExW(path.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);if(!m){p->failure="Cannot load dependency "+utf8(path.c_str())+", Windows error "+std::to_string(GetLastError());close();return false;}p->dependencies.push_back(m);}
+ for(const auto&path:p->config.dependencyPaths){auto m=LoadLibraryExW(path.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);if(!m){p->failure="Cannot load dependency "+utf8(path.c_str())+", Windows error "+std::to_string(GetLastError());close();return false;}p->dependencies.push_back(m);
+  auto name=path.substr(path.find_last_of(L"/\\")+1);
+  if(!_wcsicmp(name.c_str(),L"QuickFontCache_x64.dll"))p->fonts.attach(m,p->config.rootPath);
+ }
 
  std::wstring toolsPath=p->config.rootPath+L"/Shared/ILTools_x64.dll";
  p->toolsModule=LoadLibraryExW(toolsPath.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -294,7 +293,7 @@ bool Engine::open(const wchar_t* dll){std::lock_guard<std::recursive_mutex>g(p->
  #ifdef GRANULIZER_TRACE
  fprintf(stderr,"CREATE host=%p vt=%p first=%p owner=%p\n",&p->host,p->host.vt,p->host.vt[0],p);fflush(stderr);
 #endif
- p->plug=create(&p->host,(Word)p);if(!p->plug){if(!p->licenseBlocked)p->failure="Original DLL refused to create an instance";close();return false;}
+ p->plug=create(&p->host,(Word)p);if(!p->plug){p->failure="Original DLL refused to create an instance";close();return false;}
  p->info=*(PlugInfo**)((char*)p->plug+16);if(!p->info||p->info->params<0||p->info->params>65536){p->failure="Unsupported FL plugin ABI";close();return false;}
  if(!p->usable()){close();return false;}
  if(p->config.valid&&bool(p->info->flags&1)!=p->config.instrument){p->failure="Native plugin kind does not match bridge configuration";close();return false;}
@@ -322,6 +321,7 @@ bool Engine::open(const wchar_t* dll){std::lock_guard<std::recursive_mutex>g(p->
 void Engine::close(){std::lock_guard<std::recursive_mutex>g(p->mutex);p->closing=true;if(p->plug){p->killAll();p->disp(0);p->call<void>(0);p->plug=nullptr;p->info=nullptr;}p->closing=false;p->tempoInitialized=false;p->notifiedRate=0;p->channel=ChannelSettings{};p->sample.reset();p->ranges.clear();p->presets.clear();
  p->sharedLoader.detach();
  if(p->module){FreeLibrary(p->module);p->module=nullptr;}
+ p->fonts.detach();
  if(p->realPathManager){auto destroy=(void(__stdcall*)(void*))GetProcAddress(p->toolsModule,"DestroyPathManager");if(destroy)destroy(p->realPathManager);p->realPathManager=nullptr;}
  if(p->toolsModule){FreeLibrary(p->toolsModule);p->toolsModule=nullptr;}
  for(auto it=p->dependencies.rbegin();it!=p->dependencies.rend();++it)FreeLibrary(*it);p->dependencies.clear();if(p->host.app){releaseDialogOwner(p->dialogOwnerKey);p->host.app=nullptr;}p->dialogOwnerKey.clear();}

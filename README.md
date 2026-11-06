@@ -104,11 +104,9 @@ launch check is not a guarantee of full compatibility. Components that require
 unimplemented FL Studio host services may be unavailable. Preset, drag-and-drop,
 routing and MIDI limitations are documented in the [compatibility guide](docs/COMPATIBILITY.md).
 
-Bridge **0.6.1** rejects reported demo/trial instances and unsupported product-check
-requests, and honors native requests to disable parameter automation. This can
-also reject purchased plugins that depend on FL Studio's product-check service.
-These safeguards are not a complete license validator; see
-[runtime restrictions](docs/INSTALLED_FL.md#runtime-restrictions-bridge-061).
+Bridge **0.6.3** fixes Edison startup and missing waveform icons in 3x Osc.
+To update an existing export, close your DAW and replace the complete VST3
+bundle with a fresh export. See [bridge behavior and diagnostics](docs/INSTALLED_FL.md#runtime-behavior-bridge-063).
 
 ## Inside the project
 
@@ -138,7 +136,7 @@ FL Studio installation**. Generated binaries and plugin archives are not committ
 Exported ZIPs contain the bridge and supporting configuration/notices, not vendor assets.
 
 MIT does not grant rights to redistribute FL Studio files or override Image-Line's
-EULA. Loading installed files and adding trial safeguards do not by themselves
+EULA. Loading installed files does not by itself
 resolve legal questions about interoperability or reverse engineering.
 
 NativePluginConverter is an independent project, not affiliated with Image-Line

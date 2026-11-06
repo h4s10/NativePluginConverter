@@ -57,23 +57,20 @@ The MIT license covers project-owned code only. This loading mode avoids
 redistribution of FL Studio files; it does not grant rights under Image-Line's
 EULA, prove reverse engineering is permitted, or guarantee activation/trial behavior.
 
-## Runtime restrictions (bridge 0.6.1)
+## Runtime behavior (bridge 0.6.3)
 
-The bridge rejects native instances that report `FPF_DemoVersion` (bit 15).
-It also stops an instance when it requests `FHD_CheckProdCode` (host dispatcher
-26): that reserved service has no supported activation contract in this bridge.
-The callback does not fabricate activation data. Its ABI return value is not
-interpreted as proof of a valid license. This conservative policy can reject
-purchased plugins too; use those plugins in FL Studio.
+Bridge 0.6.3 removes the bridge-owned rejection introduced in 0.6.1 for
+`FPF_DemoVersion` (bit 15) and `FHD_CheckProdCode` (host dispatcher 26).
+An otherwise valid instance can open and receive audio, editor, preset and state
+calls in its native mode. No native flag is cleared, no activation data is
+manufactured, and no unlock-demo service is invoked.
 
-The checks run before and after native calls, including state and preset loading.
-A restriction observed during a call remains latched until the instance is closed
-and explicitly opened again. Blocked instances produce silence, reject further state save/restore requests,
-and stop further native processing. Native teardown
-is still allowed. A restriction raised within a native call cannot cancel the
-already-running call: rendered output and saved state are discarded, and a restore
-result is rejected. Any internal change already made by that restore is not rolled
-back; the instance remains unusable.
+The unsupported product-check callback returns zero without reading or writing
+its opaque value. This is the historical unhandled-service response, not a
+license result. The original plugin may still enter trial mode or refuse an
+operation. The bridge does not independently validate activation. Native state
+API calls are delegated as before; a successful call does not prove that every
+plugin accepted and completely restored a project.
 
 `FHD_KillAutomation` (host dispatcher 8) disables the inclusive parameter range
 specified by the plugin, even if requested during instance creation. Incoming DAW
@@ -83,20 +80,53 @@ the DAW from the editor idle callback. Loading another preset/state does not
 clear the restriction. The bridge cannot delete existing automation lanes from
 the DAW project; it refuses their parameter writes.
 
-The launch check reports the rejection reason. Cached checks from bridge 0.6.0
-are invalidated. Rebuild the bridge and desktop app and export new VST3 folders
-to obtain this behavior; published 0.8.0 assets and existing exports are unchanged.
-
-These are checks for known restrictive signals, not a complete license validator.
-Absence of a demo flag is not proof of ownership, activation or EULA permission.
-Nested modules and product-specific trial behavior still require separate testing;
-the bridge does not invoke the reserved unlock-demo service. Unsupported host
-warning/error callbacks are a remaining audit limitation.
+Cached launch checks from earlier bridge versions are invalidated. Rebuild the
+bridge and desktop app, then export new VST3 folders to obtain this behavior;
+existing exports and published assets are unchanged.
 
 Protocol names and numeric identifiers can be compared with the published
 [FL interface declarations in Dplug](https://github.com/AuburnSounds/Dplug/blob/master/formats/dplug/flp/types.d).
 No Dplug implementation or activation code is included in this change.
 
-The synthetic `LicensePolicyTest.exe` exercises the restrictions without vendor
-DLLs. Adapter tests additionally cover VST3 automation queues and metadata.
-These tests verify bridge behavior, not the original plugins' licensing systems.
+The synthetic `LicensePolicyTest.exe` verifies that native flags and product-check
+values remain untouched, state/audio calls are delegated, and automation
+restrictions are retained. These tests verify bridge behavior, not the original
+plugins' licensing systems or full DAW compatibility.
+
+## When a DAW says the plugin could not be opened
+
+Starting with bridge 0.6.2, initialization failures write a local report to:
+
+```text
+%LOCALAPPDATA%\NativePluginConverter\Logs\bridge-<plugin-id>.log
+```
+
+Paste the folder path into Windows Explorer. Each report identifies the plugin,
+configuration, UTC timestamp and failure reason. The latest failure overwrites
+that plugin's previous report, so repeated DAW scans do not grow the file.
+Reports stay on your computer and may contain local paths; review them before
+sharing. If this directory is not writable, failure reporting is skipped and
+the original startup failure is preserved.
+
+Alternatively, run the launch check under **Зависимости и проверка** in the
+converter on Windows x64. A DAW's generic message alone cannot distinguish a
+missing installation from an unsupported host service.
+
+Edison from the tested FL Studio installation requests `FHD_CheckProdCode` during
+creation. Bridges 0.6.1–0.6.2 reject this service before audio or state processing;
+this rejection is not proof that Edison is unlicensed. Bridge 0.6.3 removes the
+bridge-owned rejection and leaves the original plugin's flags unchanged.
+Export Edison again and replace its complete VST3 bundle to update an existing
+installation. An old startup log is historical and is not a fresh launch result.
+
+## Empty squares instead of waveform icons
+
+Bridge 0.6.2 adds a fallback for missing font-file lookups in QuickFontCache.
+Some plugins, including 3x Osc, ask for an FL font in the Windows fonts folder
+even though it is present under the selected FL Studio installation. The bridge
+resolves the font from that installation; it does not install system fonts,
+copy vendor fonts into the VST3 archive, or change the DAW's working directory.
+
+After updating the converter, export the affected plugin again, close the DAW,
+and replace its complete VST3 bundle. Existing exports do not update themselves.
+The selected FL Studio installation must still contain its original font files.

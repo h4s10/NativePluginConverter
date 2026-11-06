@@ -4,7 +4,7 @@ const fs = require('node:fs'), path = require('node:path'), os = require('node:o
 const { inspect, literals } = require('./pe');
 const { harmorFactoryPaths } = require('./preset-paths');
 const P = require('./profiles.json');
-const VERSION = '0.8.0', BRIDGE_VERSION = '0.6.1', X64 = 0x8664;
+const VERSION = '0.8.1', BRIDGE_VERSION = '0.6.3', X64 = 0x8664;
 const lower = s => s.toLowerCase(), cmp = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const sort = values => values.sort((a, b) => cmp(lower(a), lower(b)));
 function expand(s) { return path.resolve(s.startsWith('~/') ? path.join(os.homedir(), s.slice(2)) : s); }

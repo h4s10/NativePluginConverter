@@ -38,7 +38,7 @@ The script compiles `native/bridge/vst3.cpp` and `engine.cpp` into
 `resources/BridgeTemplate.vst3`, and `probe.cpp` plus `engine.cpp` into
 `resources/BridgeProbe.exe`. It verifies Windows x64 PE headers and the
 VST3 factory export before installing the outputs. Both files are ignored by Git.
-The bridge's version is 0.6.1; the desktop app's version is 0.8.0.
+The bridge's version is 0.6.2; the desktop app's version is 0.8.1.
 
 ## Desktop packages
 
@@ -65,7 +65,10 @@ Builds target Windows x64, macOS arm64/x64 and Linux x64.
 - `npm run test:native`: builds the mock adapter, channel-engine and installed-path tests. On
   Windows x64 it also executes them. On other systems, run the generated
   `build/native/AdapterTest.exe instrument`, `AdapterTest.exe effect`, and
-  `ChannelTest.exe`, `LicensePolicyTest.exe` and `InstalledConfigTest.exe` using a Windows environment. Compilation alone is not a pass.
+  `ChannelTest.exe`, `LicensePolicyTest.exe`, `InstalledConfigTest.exe`,
+  `StartupDiagnosticsTest.exe` and `InstalledFontsTest.exe` using a Windows
+  environment. Keep the three generated font fixture DLLs beside the last test.
+  Compilation alone is not a pass.
 - `npm run check:repo`: checks the files Git would publish, excluding ignored
   local build outputs. This is a targeted publication check, not a general secret scanner.
 
@@ -91,3 +94,19 @@ of project-owned binaries, retain the MIT and third-party license notices.
 Providing matching source snapshots and build instructions is recommended. Never include
 vendor plugin DLLs or assets in this project's releases. A moving `main` branch
 alone is not a substitute for the exact source used for a released binary.
+
+### Optional original FL Studio host diagnostic
+
+Run `node scripts/build-native.js --fl-host-check` to build `build/native/FLHostCheck.exe`.
+This separate Windows x64 utility asks for the installed `FL64.exe`, then loads
+the original FL Studio VSTi and engine from that installation in an isolated
+child process. It logs initialization stages, audio input/output counts and
+opaque state API results. It does not record state bytes or license data. The
+report includes the selected installation path. The parent terminates only its
+child job after 60 seconds if it stalls.
+
+`FLHostCheck.exe --self-test` checks child-process reporting and timeout cleanup
+without loading FL Studio. A successful diagnostic is not proof of Edison
+restoration or entitlement. This utility does not enable Edison in the bridge.
+Bridge 0.6.3 delegates calls in the native plugin’s own mode, independently of
+this diagnostic. Full Windows DAW compatibility still requires validation.

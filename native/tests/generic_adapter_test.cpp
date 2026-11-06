@@ -120,7 +120,7 @@ int main(int argc,char** argv) {
     CHECK(c->getBusCount(kAudio,kOutput)==1 && c->getBusCount(kAudio,kInput)==(effect?1:0));
     CHECK(a->getLatencySamples()==17);
     auto* f3=static_cast<Factory*>(factory);PClassInfo2 ci2{};CHECK(f3->getClassInfo2(0,&ci2)==kResultOk);
-    CHECK(std::string(ci2.version)=="0.6.1");
+    CHECK(std::string(ci2.version)=="0.6.3");
     CHECK(std::string(ci2.subCategories)==(effect?"Fx":"Instrument|Synth"));
     PClassInfoW ciw{};CHECK(f3->getClassInfoUnicode(0,&ciw)==kResultOk);CHECK(ciw.name[5]==0x421);
     CHECK(static_cast<unsigned char>(classInfo.cid[0])==(effect?0x22:0x12));
